@@ -334,15 +334,6 @@ resource "aws_ecs_cluster" "this" {
   )
 }
 
-resource "aws_ecs_cluster_capacity_providers" "this" {
-  cluster_name = aws_ecs_cluster.this.name
-
-  capacity_providers = [
-    "FARGATE",
-    "FARGATE_SPOT",
-  ]
-}
-
 resource "aws_iam_role" "execution" {
   name = var.execution_role_name
 
@@ -460,13 +451,14 @@ resource "aws_ecs_task_definition" "this" {
 resource "aws_ecs_service" "this" {
   name             = var.service_name
   cluster          = aws_ecs_cluster.this.id
+  launch_type      = "FARGATE"
   task_definition  = aws_ecs_task_definition.this.arn
   desired_count    = var.desired_count
   platform_version = var.platform_version
   propagate_tags   = "SERVICE"
 
   enable_ecs_managed_tags = true
-  force_new_deployment    = var.force_new_deployment
+  force_new_deployment    = true
   # Deploy workflows schedule runners immediately after Terraform returns, so
   # wait until ECS has actually rolled the control-plane task to the new version.
   wait_for_steady_state = true
@@ -476,11 +468,6 @@ resource "aws_ecs_service" "this" {
   # ECS rejects maximumPercent <= 100 while Availability Zone Rebalancing is
   # enabled. Stop-before-start services therefore disable rebalancing.
   availability_zone_rebalancing = var.deployment_maximum_percent <= 100 ? "DISABLED" : null
-
-  capacity_provider_strategy {
-    capacity_provider = var.capacity_provider
-    weight            = 1
-  }
 
   network_configuration {
     assign_public_ip = var.assign_public_ip
@@ -496,7 +483,6 @@ resource "aws_ecs_service" "this" {
   )
 
   depends_on = [
-    aws_ecs_cluster_capacity_providers.this,
     aws_iam_role_policy_attachment.execution,
     aws_iam_role_policy.execution_extra,
   ]

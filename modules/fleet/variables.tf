@@ -309,16 +309,6 @@ variable "app_size" {
   }
 }
 
-variable "app_capacity_provider" {
-  description = "Fargate capacity provider for the Fleet worker service. Use fargate_spot to lower idle cost for small installs; interrupted in-flight assigned jobs are reconciled by the Fleet runtime."
-  type        = string
-  default     = "fargate"
-
-  validation {
-    condition     = contains(["fargate", "fargate_spot"], var.app_capacity_provider)
-    error_message = "app_capacity_provider must be one of: fargate, fargate_spot."
-  }
-}
 
 variable "maintenance_mode" {
   description = "Enable maintenance mode (disables queue processing and leader election)"

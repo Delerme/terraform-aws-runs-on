@@ -53,22 +53,17 @@ variables {
   ]
 }
 
-run "defaults_to_fargate_capacity_provider" {
+run "uses_fixed_fargate_launch_type" {
   command = plan
 
   assert {
-    condition     = length(aws_ecs_service.this.capacity_provider_strategy) == 1
-    error_message = "runtime ECS service should have exactly one capacity provider strategy."
+    condition     = aws_ecs_service.this.launch_type == "FARGATE"
+    error_message = "runtime ECS service should always use the FARGATE launch type."
   }
 
   assert {
-    condition     = one(aws_ecs_service.this.capacity_provider_strategy).capacity_provider == "FARGATE"
-    error_message = "runtime ECS service should default to the FARGATE capacity provider."
-  }
-
-  assert {
-    condition     = one(aws_ecs_service.this.capacity_provider_strategy).weight == 1
-    error_message = "runtime ECS service capacity provider strategy should have weight 1."
+    condition     = length(aws_ecs_service.this.capacity_provider_strategy) == 0
+    error_message = "runtime ECS service should not configure a capacity provider strategy."
   }
 }
 
@@ -88,54 +83,16 @@ run "runtime_roles_use_permission_boundary" {
   }
 }
 
-run "defaults_force_new_deployment_false" {
+run "always_forces_new_deployment" {
   command = plan
-
-  assert {
-    condition     = aws_ecs_service.this.force_new_deployment == false
-    error_message = "runtime ECS service should not force new deployments by default."
-  }
-}
-
-run "can_force_new_deployment" {
-  command = plan
-
-  variables {
-    force_new_deployment = true
-  }
 
   assert {
     condition     = aws_ecs_service.this.force_new_deployment == true
-    error_message = "runtime ECS service should enable forced deployments when requested."
+    error_message = "runtime ECS service should always force new deployments."
   }
 }
 
-run "can_use_fargate_spot_capacity_provider" {
-  command = plan
-
-  variables {
-    capacity_provider = "FARGATE_SPOT"
-  }
-
-  assert {
-    condition     = one(aws_ecs_service.this.capacity_provider_strategy).capacity_provider == "FARGATE_SPOT"
-    error_message = "runtime ECS service should use the requested FARGATE_SPOT capacity provider."
-  }
-}
-
-run "rejects_invalid_capacity_provider" {
-  command = plan
-
-  variables {
-    capacity_provider = "SPOT"
-  }
-
-  expect_failures = [
-    var.capacity_provider,
-  ]
-}
-
-run "propagates_tags_and_uses_capacity_providers" {
+run "propagates_tags" {
   command = plan
 
   assert {
@@ -156,19 +113,6 @@ run "propagates_tags_and_uses_capacity_providers" {
   assert {
     condition     = aws_ecs_service.this.tags.Name == "test-stack-runs-on"
     error_message = "runtime ECS service should include the module-computed Name tag."
-  }
-
-  assert {
-    condition = toset(aws_ecs_cluster_capacity_providers.this.capacity_providers) == toset([
-      "FARGATE",
-      "FARGATE_SPOT",
-    ])
-    error_message = "runtime ECS cluster should register both supported Fargate capacity providers."
-  }
-
-  assert {
-    condition     = length(aws_ecs_service.this.capacity_provider_strategy) == 1
-    error_message = "runtime ECS service should use capacity provider strategy, not launch_type."
   }
 }
 

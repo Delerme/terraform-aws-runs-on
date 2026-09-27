@@ -250,22 +250,6 @@ variable "app_size" {
   }
 }
 
-variable "app_capacity_provider" {
-  description = "Fargate capacity provider for the RunsOn worker service. Use fargate_spot to lower idle cost for small installs; interrupted in-flight queue messages retry after the SQS visibility timeout."
-  type        = string
-  default     = "fargate"
-
-  validation {
-    condition     = contains(["fargate", "fargate_spot"], var.app_capacity_provider)
-    error_message = "app_capacity_provider must be one of: fargate, fargate_spot."
-  }
-}
-
-variable "app_force_new_deployment" {
-  description = "Force a new ECS deployment of the RunsOn control-plane service. Set to true for one apply when migrating existing installs across the v3.0.6 ECS capacity provider change or when changing app_capacity_provider."
-  type        = bool
-  default     = false
-}
 
 variable "app_ecr_repository_url" {
   description = "Private ECR repository URL for RunsOn image (e.g., 123456789012.dkr.ecr.us-east-1.amazonaws.com/my-repo:tag). When specified, the worker service will pull from this private ECR instead of public ECR."

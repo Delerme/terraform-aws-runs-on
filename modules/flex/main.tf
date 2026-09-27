@@ -90,8 +90,8 @@ locals {
     tag                       = var.app_tag
     maintenance_mode          = var.maintenance_mode
     size                      = var.app_size
-    capacity_provider         = upper(var.app_capacity_provider)
-    force_new_deployment      = var.app_force_new_deployment
+    capacity_provider         = "FARGATE"
+    force_new_deployment      = true
     private_mode              = var.private_mode
     ecr_repository_url        = var.app_ecr_repository_url
     custom_policy_arns        = var.app_custom_policy_arns
@@ -234,7 +234,7 @@ locals {
     }
     runtime = {
       app_size            = var.app_size
-      capacity_provider   = upper(var.app_capacity_provider)
+      capacity_provider   = "FARGATE"
       maintenance_mode    = var.maintenance_mode
       github_api_strategy = var.github_api_strategy
     }

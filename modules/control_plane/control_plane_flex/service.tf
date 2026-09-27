@@ -140,8 +140,6 @@ module "runtime" {
   cpu                             = local.app_size_config.cpu
   memory                          = local.app_size_config.memory
   desired_count                   = local.runtime.maintenance_mode ? 0 : 1
-  capacity_provider               = local.runtime.capacity_provider
-  force_new_deployment            = local.runtime.force_new_deployment
   assign_public_ip                = local.runtime.private_mode == "false"
   security_group_ids              = var.network.security_group_ids
   subnet_ids                      = local.runtime.private_mode == "false" ? var.network.public_subnet_ids : var.network.private_subnet_ids

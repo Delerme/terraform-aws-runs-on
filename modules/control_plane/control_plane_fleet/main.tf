@@ -61,6 +61,7 @@ locals {
     errors      = []
     app_version = local.control_plane.app_tag
   })
+  fleet_otel_exporter_headers_configured = nonsensitive(local.runtime.otel_exporter_headers != "")
 
   secret_payload = {
     schema_version        = 4
@@ -151,7 +152,7 @@ locals {
     },
   ]
 
-  fleet_extra_execution_role_statements = local.runtime.otel_exporter_headers != "" ? [
+  fleet_extra_execution_role_statements = local.fleet_otel_exporter_headers_configured ? [
     {
       Effect = "Allow"
       Action = [
@@ -217,6 +218,10 @@ removed {
   # Preserve pre-materializer config versions in Secrets Manager while removing
   # provider ownership of staging labels from existing Fleet state.
   from = aws_secretsmanager_secret_version.config
+
+  lifecycle {
+    destroy = true
+  }
 }
 
 resource "aws_ssm_parameter" "license_status" {
@@ -340,14 +345,14 @@ module "runtime" {
             # The SSM parameter ARN in `secrets` is stable across value
             # changes; embedding the parameter version forces a new task
             # definition (and deployment) whenever the headers rotate.
-            RUNS_ON_OTEL_HEADERS_VERSION = local.runtime.otel_exporter_headers != "" ? tostring(aws_ssm_parameter.otel_exporter_headers[0].version) : ""
+            RUNS_ON_OTEL_HEADERS_VERSION = local.fleet_otel_exporter_headers_configured ? tostring(aws_ssm_parameter.otel_exporter_headers[0].version) : ""
           },
           local.runtime.extra_env_vars,
         ) : { name = key, value = value }
         if value != ""
       ]
       secrets = concat(
-        local.runtime.otel_exporter_headers != "" ? [
+        local.fleet_otel_exporter_headers_configured ? [
           {
             name      = "OTEL_EXPORTER_OTLP_HEADERS"
             valueFrom = aws_ssm_parameter.otel_exporter_headers[0].arn

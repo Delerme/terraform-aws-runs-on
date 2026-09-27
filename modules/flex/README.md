@@ -222,23 +222,9 @@ terraform output -raw runs_on_getting_started
 
 Inputs such as `app_size`, `app_image`, and `app_tag` configure the ECS worker service. `app_size` also sets the default webhook worker count, provisioning launch concurrency, registration concurrency, and the matching launch-related rate-limit assumptions used by the server. `RUNS_ON_APP_WEBHOOK_CONCURRENCY`, `RUNS_ON_APP_PROVISIONING_CONCURRENCY`, and `RUNS_ON_APP_REGISTRATION_CONCURRENCY` can override those worker counts through `extra_env_vars`.
 
-## Upgrading Existing Installs Across v3.0.6
+## ECS Worker Service
 
-RunsOn `v3.0.6` changed the Flex control-plane ECS service from `launch_type = "FARGATE"` to an ECS capacity provider strategy so the service can run on `fargate` or `fargate_spot`.
-
-For existing installs created before this change, the Terraform AWS provider may require a one-time forced ECS deployment when applying the upgrade. If Terraform reports:
-
-```text
-force_new_deployment should be true when capacity_provider_strategy is being updated
-```
-
-set:
-
-```hcl
-app_force_new_deployment = true
-```
-
-for one apply, then remove it or set it back to `false` after the upgrade has completed.
+The Flex worker service uses the `fargate` capacity provider and always forces a new ECS deployment during apply.
 
 ## Docs
 
@@ -334,10 +320,8 @@ Minimal key-policy statement:
 | <a name="input_vpc_id"></a> [vpc\_id](#input\_vpc\_id) | VPC ID where RunsOn infrastructure will be deployed | `string` | n/a | yes |
 | <a name="input_alert_slack_webhook_url"></a> [alert\_slack\_webhook\_url](#input\_alert\_slack\_webhook\_url) | Slack webhook URL for alert notifications (optional) | `string` | `""` | no |
 | <a name="input_app_budget_daily_usd"></a> [app\_budget\_daily\_usd](#input\_app\_budget\_daily\_usd) | Daily AWS cost budget in USD for this stack, filtered by the configured cost allocation tag. Set to 0 to disable the budget. For AWS Organizations member accounts, activate the cost allocation tag in the management account's Billing settings. | `number` | `10` | no |
-| <a name="input_app_capacity_provider"></a> [app\_capacity\_provider](#input\_app\_capacity\_provider) | Fargate capacity provider for the RunsOn worker service. Use fargate\_spot to lower idle cost for small installs; interrupted in-flight queue messages retry after the SQS visibility timeout. | `string` | `"fargate"` | no |
 | <a name="input_app_custom_policy_arns"></a> [app\_custom\_policy\_arns](#input\_app\_custom\_policy\_arns) | Optional managed IAM policy ARNs to attach to the RunsOn service role. | `list(string)` | `[]` | no |
 | <a name="input_app_ecr_repository_url"></a> [app\_ecr\_repository\_url](#input\_app\_ecr\_repository\_url) | Private ECR repository URL for RunsOn image (e.g., 123456789012.dkr.ecr.us-east-1.amazonaws.com/my-repo:tag). When specified, the worker service will pull from this private ECR instead of public ECR. | `string` | `""` | no |
-| <a name="input_app_force_new_deployment"></a> [app\_force\_new\_deployment](#input\_app\_force\_new\_deployment) | Force a new ECS deployment of the RunsOn control-plane service. Set to true for one apply when migrating existing installs across the v3.0.6 ECS capacity provider change or when changing app\_capacity\_provider. | `bool` | `false` | no |
 | <a name="input_app_image"></a> [app\_image](#input\_app\_image) | Container image for the RunsOn worker service. Published module releases inject a pinned public default during mirror publication. | `string` | `"public.ecr.aws/c5h5o9k1/runs-on/runs-on:v3.3.2@sha256:53df89ebc3396f87b88790807fe6be04b01242bad0c52122fab9795690d18533"` | no |
 | <a name="input_app_size"></a> [app\_size](#input\_app\_size) | Preset for the worker service, default EC2 launch concurrency, and default registration concurrency. Allowed values: small, medium, high, xhigh. | `string` | `"small"` | no |
 | <a name="input_app_tag"></a> [app\_tag](#input\_app\_tag) | Application version tag for RunsOn service. Published module releases inject the released default during mirror publication. | `string` | `"v3.3.2"` | no |

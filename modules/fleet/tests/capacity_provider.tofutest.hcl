@@ -254,16 +254,12 @@ run "exports_alerts_with_slack_webhook" {
   }
 }
 
-run "can_use_fargate_spot_capacity_provider" {
+run "capacity_provider_is_fargate" {
   command = plan
 
-  variables {
-    app_capacity_provider = "fargate_spot"
-  }
-
   assert {
-    condition     = local.fleet_runtime.capacity_provider == "FARGATE_SPOT"
-    error_message = "Fleet should pass FARGATE_SPOT to the runtime service."
+    condition     = local.fleet_runtime.capacity_provider == "FARGATE"
+    error_message = "Fleet should use the FARGATE capacity provider."
   }
 }
 
@@ -839,15 +835,6 @@ run "empty_public_subnets_rejected_unless_private_only" {
   expect_failures = [terraform_data.validate_public_subnets]
 }
 
-run "rejects_invalid_capacity_provider" {
-  command = plan
-
-  variables {
-    app_capacity_provider = "spot"
-  }
-
-  expect_failures = [var.app_capacity_provider]
-}
 
 run "rejects_empty_stack_name" {
   command = plan

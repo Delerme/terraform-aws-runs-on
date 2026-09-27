@@ -368,26 +368,20 @@ run "private_mode_delay_creates_nat_wait" {
   }
 }
 
-run "invalid_capacity_provider_is_rejected" {
+run "capacity_provider_is_fargate" {
   command = plan
-
-  variables {
-    app_capacity_provider = "spot"
+  assert {
+    condition     = local.flex_runtime.capacity_provider == "FARGATE"
+    error_message = "Flex should use the FARGATE capacity provider."
   }
-
-  expect_failures = [var.app_capacity_provider]
 }
 
-run "app_force_new_deployment_flows_to_runtime" {
+run "force_new_deployment_is_enabled" {
   command = plan
-
-  variables {
-    app_force_new_deployment = true
-  }
 
   assert {
     condition     = local.flex_runtime.force_new_deployment == true
-    error_message = "app_force_new_deployment should flow into the runtime config."
+    error_message = "Flex should always force a new ECS deployment."
   }
 }
 

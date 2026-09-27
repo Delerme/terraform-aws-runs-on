@@ -76,7 +76,7 @@ locals {
   fleet_runtime = {
     image                     = var.runtime_image
     size                      = var.app_size
-    capacity_provider         = upper(var.app_capacity_provider)
+    capacity_provider         = "FARGATE"
     maintenance_mode          = var.maintenance_mode
     log_retention_days        = var.log_retention_days
     otel_exporter_endpoint    = var.otel_exporter_endpoint
@@ -187,7 +187,7 @@ locals {
     }
     runtime = {
       app_size          = var.app_size
-      capacity_provider = upper(var.app_capacity_provider)
+      capacity_provider = "FARGATE"
       maintenance_mode  = var.maintenance_mode
     }
     telemetry = {

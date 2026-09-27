@@ -305,7 +305,7 @@ https://github.com/settings/tokens/new?description=RunsOn%20Fleet%20%5B<ENTERPRI
 
 Each fleet key maps to one fleet name and one GitHub runner scale set. The runtime names GitHub scale sets with stack scope, so stack `runs-on-fleet-preview-v3` and fleet `linux-small` create scale set `runs-on-fleet-preview-v3-linux-small`.
 
-`app_capacity_provider` controls whether the Fleet ECS worker service runs on `fargate` or `fargate_spot`.
+The Fleet ECS worker service uses the `fargate` capacity provider.
 
 The rendered runtime secret still carries the internal `github_private_key` field name because that schema is owned by `pkg/fleet`.
 
@@ -422,7 +422,6 @@ You can also create the rule outside the module with `aws_ecr_pull_through_cache
 | <a name="input_stack_name"></a> [stack\_name](#input\_stack\_name) | Name of the RunsOn Fleet stack. | `string` | n/a | yes |
 | <a name="input_vpc_id"></a> [vpc\_id](#input\_vpc\_id) | VPC ID where the Fleet stack will run. | `string` | n/a | yes |
 | <a name="input_alert_slack_webhook_url"></a> [alert\_slack\_webhook\_url](#input\_alert\_slack\_webhook\_url) | Slack webhook URL for alert notifications (optional) | `string` | `""` | no |
-| <a name="input_app_capacity_provider"></a> [app\_capacity\_provider](#input\_app\_capacity\_provider) | Fargate capacity provider for the Fleet worker service. Use fargate\_spot to lower idle cost for small installs; interrupted in-flight assigned jobs are reconciled by the Fleet runtime. | `string` | `"fargate"` | no |
 | <a name="input_app_size"></a> [app\_size](#input\_app\_size) | Preset for the Fleet worker service, default EC2 launch concurrency, and default registration concurrency. Allowed values: small, medium, high, xhigh. | `string` | `"small"` | no |
 | <a name="input_app_tag"></a> [app\_tag](#input\_app\_tag) | Application/agent tag published into the cache bucket and passed to runners. Passing null falls back to the default, which release publication pins to the released version. | `string` | `"v3.3.2"` | no |
 | <a name="input_bootstrap_tag"></a> [bootstrap\_tag](#input\_bootstrap\_tag) | Bootstrap release tag used by the shared compute bootstrap template. | `string` | `"v0.1.17"` | no |

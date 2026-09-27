@@ -85,11 +85,6 @@ variable "app_size" {
   default     = "small"
 }
 
-variable "app_capacity_provider" {
-  description = "Example Fleet worker capacity provider."
-  type        = string
-  default     = "fargate"
-}
 
 variable "vpc_id" {
   description = "Example VPC id."

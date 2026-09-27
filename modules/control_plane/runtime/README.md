@@ -30,7 +30,6 @@ No modules.
 |------|------|
 | [aws_cloudwatch_log_group.this](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/cloudwatch_log_group) | resource |
 | [aws_ecs_cluster.this](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/ecs_cluster) | resource |
-| [aws_ecs_cluster_capacity_providers.this](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/ecs_cluster_capacity_providers) | resource |
 | [aws_ecs_service.this](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/ecs_service) | resource |
 | [aws_ecs_task_definition.this](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/ecs_task_definition) | resource |
 | [aws_iam_role.execution](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/iam_role) | resource |
@@ -65,14 +64,12 @@ No modules.
 | <a name="input_task_definition_family"></a> [task\_definition\_family](#input\_task\_definition\_family) | Task definition family | `string` | n/a | yes |
 | <a name="input_task_policy_name"></a> [task\_policy\_name](#input\_task\_policy\_name) | Inline policy name for the shared ECS task role | `string` | n/a | yes |
 | <a name="input_task_role_name"></a> [task\_role\_name](#input\_task\_role\_name) | Shared ECS task role name | `string` | n/a | yes |
-| <a name="input_capacity_provider"></a> [capacity\_provider](#input\_capacity\_provider) | ECS capacity provider used by the service | `string` | `"FARGATE"` | no |
 | <a name="input_container_insights_enabled"></a> [container\_insights\_enabled](#input\_container\_insights\_enabled) | Enable ECS container insights on the cluster | `bool` | `true` | no |
 | <a name="input_deployment_maximum_percent"></a> [deployment\_maximum\_percent](#input\_deployment\_maximum\_percent) | Maximum deployment percentage | `number` | `200` | no |
 | <a name="input_deployment_minimum_healthy_percent"></a> [deployment\_minimum\_healthy\_percent](#input\_deployment\_minimum\_healthy\_percent) | Minimum healthy deployment percentage | `number` | `0` | no |
 | <a name="input_ebs_encryption_key_id"></a> [ebs\_encryption\_key\_id](#input\_ebs\_encryption\_key\_id) | Optional EBS encryption key ID | `string` | `""` | no |
 | <a name="input_extra_execution_role_statements"></a> [extra\_execution\_role\_statements](#input\_extra\_execution\_role\_statements) | Additional IAM statements appended to the ECS task execution role policy | `any` | `[]` | no |
 | <a name="input_extra_task_role_statements"></a> [extra\_task\_role\_statements](#input\_extra\_task\_role\_statements) | Additional IAM statements appended to the shared task role policy | `any` | `[]` | no |
-| <a name="input_force_new_deployment"></a> [force\_new\_deployment](#input\_force\_new\_deployment) | Force a new ECS deployment of the worker service. | `bool` | `false` | no |
 | <a name="input_permission_boundary_arn"></a> [permission\_boundary\_arn](#input\_permission\_boundary\_arn) | Optional IAM permissions boundary ARN applied to runtime roles | `string` | `""` | no |
 | <a name="input_platform_version"></a> [platform\_version](#input\_platform\_version) | Fargate platform version | `string` | `"LATEST"` | no |
 | <a name="input_task_role_managed_policy_arns"></a> [task\_role\_managed\_policy\_arns](#input\_task\_role\_managed\_policy\_arns) | Managed policy ARNs attached to the shared task role | `list(string)` | `[]` | no |
