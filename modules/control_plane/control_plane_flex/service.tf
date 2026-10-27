@@ -2,9 +2,10 @@
 
 locals {
   # Also read by the setup Lambda for its status page.
-  runtime_cluster_name = var.stack_name
-  runtime_service_name = "flexd"
-  flex_control_plane_extra_execution_role_statements = local.runtime.otel_exporter_headers != "" ? [
+  runtime_cluster_name                  = var.stack_name
+  runtime_service_name                  = "flexd"
+  flex_otel_exporter_headers_configured = nonsensitive(local.runtime.otel_exporter_headers != "")
+  flex_control_plane_extra_execution_role_statements = local.flex_otel_exporter_headers_configured ? [
     {
       Effect = "Allow"
       Action = [
@@ -154,8 +155,6 @@ module "runtime" {
   cpu                             = local.app_size_config.cpu
   memory                          = local.app_size_config.memory
   desired_count                   = local.runtime.maintenance_mode ? 0 : 1
-  capacity_provider               = local.runtime.capacity_provider
-  force_new_deployment            = local.runtime.force_new_deployment
   assign_public_ip                = local.runtime.private_mode == "false"
   security_group_ids              = var.network.security_group_ids
   subnet_ids                      = local.runtime.private_mode == "false" ? var.network.public_subnet_ids : var.network.private_subnet_ids
@@ -179,7 +178,7 @@ module "runtime" {
         }
       ]
       secrets = concat(
-        local.runtime.otel_exporter_headers != "" ? [
+        local.flex_otel_exporter_headers_configured ? [
           {
             name      = "OTEL_EXPORTER_OTLP_HEADERS"
             valueFrom = aws_ssm_parameter.otel_exporter_headers[0].arn

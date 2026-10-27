@@ -61,6 +61,7 @@ locals {
     errors      = []
     app_version = local.control_plane.app_tag
   })
+  fleet_otel_exporter_headers_configured = nonsensitive(local.runtime.otel_exporter_headers != "")
 
   secret_payload = {
     schema_version        = 4
@@ -161,7 +162,7 @@ locals {
     },
   ] : [])
 
-  fleet_extra_execution_role_statements = local.runtime.otel_exporter_headers != "" ? [
+  fleet_extra_execution_role_statements = local.fleet_otel_exporter_headers_configured ? [
     {
       Effect = "Allow"
       Action = [
@@ -326,7 +327,6 @@ module "runtime" {
   # Fleet owns one scale-set session and process-local pool publication fence.
   # Stop the old controller before ECS starts its replacement.
   deployment_maximum_percent = 100
-  capacity_provider          = local.runtime.capacity_provider
   assign_public_ip           = local.control_plane.private_mode == "false"
   security_group_ids         = var.network.security_group_ids
   subnet_ids                 = local.control_plane.private_mode == "false" ? var.network.public_subnet_ids : var.network.private_subnet_ids
@@ -354,14 +354,14 @@ module "runtime" {
             # The SSM parameter ARN in `secrets` is stable across value
             # changes; embedding the parameter version forces a new task
             # definition (and deployment) whenever the headers rotate.
-            RUNS_ON_OTEL_HEADERS_VERSION = local.runtime.otel_exporter_headers != "" ? tostring(aws_ssm_parameter.otel_exporter_headers[0].version) : ""
+            RUNS_ON_OTEL_HEADERS_VERSION = local.fleet_otel_exporter_headers_configured ? tostring(aws_ssm_parameter.otel_exporter_headers[0].version) : ""
           },
           local.runtime.extra_env_vars,
         ) : { name = key, value = value }
         if value != ""
       ]
       secrets = concat(
-        local.runtime.otel_exporter_headers != "" ? [
+        local.fleet_otel_exporter_headers_configured ? [
           {
             name      = "OTEL_EXPORTER_OTLP_HEADERS"
             valueFrom = aws_ssm_parameter.otel_exporter_headers[0].arn

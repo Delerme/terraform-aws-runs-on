@@ -28,7 +28,6 @@ module "runs_on_fleet" {
   integration_step_security_api_key = var.integration_step_security_api_key
   environment                       = var.environment
   app_size                          = var.app_size
-  app_capacity_provider             = var.app_capacity_provider
   vpc_id                            = var.vpc_id
   public_subnet_ids                 = var.public_subnet_ids
   private_subnet_ids                = var.private_subnet_ids

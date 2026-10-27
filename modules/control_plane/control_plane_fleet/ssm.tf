@@ -1,5 +1,5 @@
 resource "aws_ssm_parameter" "otel_exporter_headers" {
-  count = local.runtime.otel_exporter_headers != "" ? 1 : 0
+  count = nonsensitive(local.runtime.otel_exporter_headers != "") ? 1 : 0
 
   name  = "/${var.stack_name}/secrets/otel-exporter-headers"
   type  = "SecureString"
